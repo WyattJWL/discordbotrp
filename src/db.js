@@ -44,6 +44,7 @@ function getUser(guildId, userId) {
       revenu: null,
       statut: null,
       partenaire: null,
+      partenaireConfirme: false,
       reductionPourcent: 0,
       totalDeclare: 0,
       derniereDeclarationAt: null,
@@ -53,13 +54,55 @@ function getUser(guildId, userId) {
   return guild.users[userId];
 }
 
-function setUserProfil(guildId, userId, { revenu, statut, partenaire }) {
+function setUserProfil(guildId, userId, { revenu, statut, partenaireId }) {
   const user = getUser(guildId, userId);
+
+  // Si on change de partenaire (ou qu'on repasse seul), on délie l'ancien partenaire confirmé.
+  if (user.partenaire && user.partenaire !== partenaireId) {
+    const ancien = getUser(guildId, user.partenaire);
+    if (ancien.partenaire === userId) {
+      ancien.statut = 'seul';
+      ancien.partenaire = null;
+      ancien.partenaireConfirme = false;
+    }
+  }
+
   user.revenu = revenu;
   user.statut = statut;
-  user.partenaire = statut === 'couple' ? partenaire : null;
+
+  if (statut === 'couple') {
+    const dejaConfirme = user.partenaire === partenaireId && user.partenaireConfirme;
+    user.partenaire = partenaireId;
+    user.partenaireConfirme = dejaConfirme;
+  } else {
+    user.partenaire = null;
+    user.partenaireConfirme = false;
+  }
+
   save();
   return user;
+}
+
+function confirmerCouple(guildId, inviteurId, accepteurId) {
+  const inviteur = getUser(guildId, inviteurId);
+  inviteur.statut = 'couple';
+  inviteur.partenaire = accepteurId;
+  inviteur.partenaireConfirme = true;
+
+  const accepteur = getUser(guildId, accepteurId);
+  accepteur.statut = 'couple';
+  accepteur.partenaire = inviteurId;
+  accepteur.partenaireConfirme = true;
+
+  save();
+}
+
+function refuserCouple(guildId, inviteurId) {
+  const inviteur = getUser(guildId, inviteurId);
+  inviteur.statut = 'seul';
+  inviteur.partenaire = null;
+  inviteur.partenaireConfirme = false;
+  save();
 }
 
 function resetUser(guildId, userId) {
@@ -163,6 +206,8 @@ module.exports = {
   getGuild,
   getUser,
   setUserProfil,
+  confirmerCouple,
+  refuserCouple,
   resetUser,
   ajusterTotal,
   enregistrerDeclaration,

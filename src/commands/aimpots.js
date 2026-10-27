@@ -3,7 +3,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const db = require('../db');
 const embeds = require('../embeds');
-const { estAdmin, formatMontant } = require('../util');
+const { estAdmin, formatMontant, obtenirNomAffichage } = require('../util');
 const { calculerImpotHebdomadaire } = require('../tax');
 const { repondre } = require('../reponse');
 
@@ -68,24 +68,26 @@ module.exports = {
   }
 };
 
-function ajusterMontant(interaction, guildId, config, sens) {
+async function ajusterMontant(interaction, guildId, config, sens) {
   const utilisateur = interaction.options.getUser('membre');
   const montant = interaction.options.getNumber('montant');
+  const nom = await obtenirNomAffichage(interaction.client, guildId, utilisateur.id);
 
   const user = db.ajusterTotal(guildId, utilisateur.id, montant * sens);
   const action = sens > 0 ? 'ajouté à' : 'retiré de';
 
   return repondre(interaction, embeds.succes(
     'Montant ajusté',
-    `${formatMontant(montant, config.devise)} ${action} le total déclaré de ${utilisateur.username}.\n` +
+    `${formatMontant(montant, config.devise)} ${action} le total déclaré de ${nom}.\n` +
     `Nouveau total : ${formatMontant(user.totalDeclare, config.devise)}`
   ));
 }
 
-function resetMembre(interaction, guildId) {
+async function resetMembre(interaction, guildId) {
   const utilisateur = interaction.options.getUser('membre');
+  const nom = await obtenirNomAffichage(interaction.client, guildId, utilisateur.id);
   db.resetUser(guildId, utilisateur.id);
-  return repondre(interaction, embeds.succes('Profil réinitialisé', `Le profil fiscal de ${utilisateur.username} a été réinitialisé.`));
+  return repondre(interaction, embeds.succes('Profil réinitialisé', `Le profil fiscal de ${nom} a été réinitialisé.`));
 }
 
 function configurerTelephone(interaction, guildId) {
@@ -94,25 +96,32 @@ function configurerTelephone(interaction, guildId) {
   return repondre(interaction, embeds.succes('Numéro mis à jour', `Le numéro affiché par \`/himpot\` est maintenant : **${numero}**`));
 }
 
-function voirMembre(interaction, guildId, config) {
+async function voirMembre(interaction, guildId, config) {
   const utilisateur = interaction.options.getUser('membre');
+  const nom = await obtenirNomAffichage(interaction.client, guildId, utilisateur.id);
   const user = db.getUser(guildId, utilisateur.id);
 
   if (user.revenu === null) {
-    return repondre(interaction, embeds.info(`Profil de ${utilisateur.username}`, "Ce membre n'a pas encore configuré ses impôts."));
+    return repondre(interaction, embeds.info(`Profil de ${nom}`, "Ce membre n'a pas encore configuré ses impôts."));
+  }
+
+  let ligneStatut = `**Statut :** ${user.statut}`;
+  if (user.statut === 'couple' && user.partenaire) {
+    const nomPartenaire = await obtenirNomAffichage(interaction.client, guildId, user.partenaire);
+    ligneStatut += ` avec ${nomPartenaire}${user.partenaireConfirme ? '' : ' (en attente de confirmation)'}`;
   }
 
   const impot = calculerImpotHebdomadaire(user, config);
   const lignes = [
     `**Revenu :** ${formatMontant(user.revenu, config.devise)} / semaine`,
-    `**Statut :** ${user.statut}${user.partenaire ? ` avec ${user.partenaire}` : ''}`,
+    ligneStatut,
     `**Réduction :** ${user.reductionPourcent}%`,
     `**Impôt / semaine :** ${formatMontant(impot, config.devise)}`,
     `**Total déclaré :** ${formatMontant(user.totalDeclare, config.devise)}`,
     `**Dernière déclaration :** ${user.derniereDeclarationAt ? new Date(user.derniereDeclarationAt).toLocaleString('fr-FR') : 'jamais'}`
   ];
 
-  return repondre(interaction, embeds.info(`Profil de ${utilisateur.username}`, lignes.join('\n')));
+  return repondre(interaction, embeds.info(`Profil de ${nom}`, lignes.join('\n')));
 }
 
 function listerMembres(interaction, guildId, config) {
@@ -125,7 +134,8 @@ function listerMembres(interaction, guildId, config) {
 
   const lignes = entries.map(([id, u]) => {
     const impot = calculerImpotHebdomadaire(u, config);
-    return `<@${id}> — ${formatMontant(impot, config.devise)}/sem — total déclaré : ${formatMontant(u.totalDeclare, config.devise)}`;
+    const statutCouple = u.statut === 'couple' ? (u.partenaireConfirme ? ' 💑' : ' 💌') : '';
+    return `<@${id}>${statutCouple} — ${formatMontant(impot, config.devise)}/sem — total déclaré : ${formatMontant(u.totalDeclare, config.devise)}`;
   });
 
   return repondre(interaction, embeds.info("Vue d'ensemble des impôts", lignes.join('\n')));

@@ -24,4 +24,23 @@ function parseDuree(arg) {
   return Date.now() + nombre * 24 * 60 * 60 * 1000;
 }
 
-module.exports = { formatMontant, estAdmin, parseDuree };
+/**
+ * Nom d'affichage RP : le pseudo/surnom sur le serveur (souvent le nom de personnage),
+ * avec repli sur le nom d'utilisateur Discord global si la personne n'est plus sur le serveur.
+ */
+async function obtenirNomAffichage(client, guildId, userId) {
+  try {
+    const guild = await client.guilds.fetch(guildId);
+    const membre = await guild.members.fetch(userId);
+    return membre.displayName;
+  } catch {
+    try {
+      const user = await client.users.fetch(userId);
+      return user.username;
+    } catch {
+      return 'Utilisateur inconnu';
+    }
+  }
+}
+
+module.exports = { formatMontant, estAdmin, parseDuree, obtenirNomAffichage };

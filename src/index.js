@@ -6,6 +6,7 @@ const path = require('path');
 const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
 
 const config = require(path.join(__dirname, '..', 'config.json'));
+const { gererBouton } = require('./boutons');
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
@@ -26,20 +27,29 @@ client.once('clientReady', () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
+  if (interaction.isChatInputCommand()) {
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
 
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
+    try {
+      await command.execute(interaction, config, client.commands);
+    } catch (err) {
+      console.error(`Erreur dans la commande ${interaction.commandName} :`, err);
+      const payload = { content: 'Une erreur est survenue en exécutant cette commande.', ephemeral: true };
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(payload).catch(() => {});
+      } else {
+        await interaction.reply(payload).catch(() => {});
+      }
+    }
+    return;
+  }
 
-  try {
-    await command.execute(interaction, config, client.commands);
-  } catch (err) {
-    console.error(`Erreur dans la commande ${interaction.commandName} :`, err);
-    const payload = { content: 'Une erreur est survenue en exécutant cette commande.', ephemeral: true };
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp(payload).catch(() => {});
-    } else {
-      await interaction.reply(payload).catch(() => {});
+  if (interaction.isButton()) {
+    try {
+      await gererBouton(interaction);
+    } catch (err) {
+      console.error('Erreur dans la gestion du bouton :', err);
     }
   }
 });

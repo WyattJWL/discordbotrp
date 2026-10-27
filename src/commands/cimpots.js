@@ -1,14 +1,14 @@
 'use strict';
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const db = require('../db');
 const { calculerImpotHebdomadaire } = require('../tax');
-const { formatMontant } = require('../util');
+const { formatMontant, obtenirNomAffichage } = require('../util');
 const { repondre } = require('../reponse');
 const embeds = require('../embeds');
 
 module.exports = {
-  usage: '/cimpots configurer revenu:<nombre> statut:<seul|couple> [partenaire:<nom>]  |  /cimpots profil  |  /cimpots code code:<CODE>',
+  usage: '/cimpots configurer revenu:<nombre> statut:<seul|couple> [partenaire:<@membre>]  |  /cimpots profil  |  /cimpots code code:<CODE>',
   description: 'Configurer ton profil fiscal, le consulter, ou utiliser un code promo.',
   data: new SlashCommandBuilder()
     .setName('cimpots')
@@ -22,7 +22,7 @@ module.exports = {
         .setDescription('Seul ou en couple')
         .setRequired(true)
         .addChoices({ name: 'Seul', value: 'seul' }, { name: 'Couple', value: 'couple' }))
-      .addStringOption((opt) => opt.setName('partenaire').setDescription('Nom du/de la partenaire (si en couple)').setRequired(false)))
+      .addUserOption((opt) => opt.setName('partenaire').setDescription('Ton/ta partenaire (si en couple) — il/elle devra accepter').setRequired(false)))
     .addSubcommand((sub) => sub
       .setName('profil')
       .setDescription('Voir ton profil fiscal actuel.'))
@@ -39,8 +39,9 @@ module.exports = {
   }
 };
 
-function afficherProfil(interaction, config) {
-  const user = db.getUser(interaction.guild.id, interaction.user.id);
+async function afficherProfil(interaction, config) {
+  const guildId = interaction.guild.id;
+  const user = db.getUser(guildId, interaction.user.id);
 
   if (user.revenu === null) {
     return repondre(interaction, embeds.info(
@@ -50,9 +51,16 @@ function afficherProfil(interaction, config) {
   }
 
   const impot = calculerImpotHebdomadaire(user, config);
+  let ligneStatut = `**Statut :** ${user.statut}`;
+
+  if (user.statut === 'couple' && user.partenaire) {
+    const nomPartenaire = await obtenirNomAffichage(interaction.client, guildId, user.partenaire);
+    ligneStatut += ` avec ${nomPartenaire}${user.partenaireConfirme ? '' : ' _(en attente de confirmation)_'}`;
+  }
+
   const lignes = [
     `**Revenu déclaré :** ${formatMontant(user.revenu, config.devise)} / semaine`,
-    `**Statut :** ${user.statut}${user.partenaire ? ` avec ${user.partenaire}` : ''}`,
+    ligneStatut,
     `**Réduction active :** ${user.reductionPourcent}%`,
     `**Impôt à payer / semaine :** ${formatMontant(impot, config.devise)}`,
     `**Total déclaré (historique) :** ${formatMontant(user.totalDeclare, config.devise)}`
@@ -61,32 +69,84 @@ function afficherProfil(interaction, config) {
   return repondre(interaction, embeds.info('Ton profil fiscal', lignes.join('\n')));
 }
 
-function configurerProfil(interaction, config) {
+async function configurerProfil(interaction, config) {
   const revenu = interaction.options.getNumber('revenu');
   const statut = interaction.options.getString('statut');
-  const partenaire = (interaction.options.getString('partenaire') || '').trim();
+  const partenaireUser = interaction.options.getUser('partenaire');
+  const guildId = interaction.guild.id;
 
-  if (statut === 'couple' && !partenaire) {
-    return repondre(interaction, embeds.erreur(
-      'Partenaire manquant',
-      "En couple, précise le nom du/de la partenaire dans l'option `partenaire`."
+  if (statut === 'couple') {
+    if (!partenaireUser) {
+      return repondre(interaction, embeds.erreur(
+        'Partenaire manquant',
+        "En couple, choisis ton/ta partenaire dans l'option `partenaire`."
+      ));
+    }
+    if (partenaireUser.id === interaction.user.id) {
+      return repondre(interaction, embeds.erreur('Partenaire invalide', 'Tu ne peux pas te mettre en couple avec toi-même.'));
+    }
+    if (partenaireUser.bot) {
+      return repondre(interaction, embeds.erreur('Partenaire invalide', 'Tu ne peux pas te mettre en couple avec un bot.'));
+    }
+  }
+
+  db.setUserProfil(guildId, interaction.user.id, {
+    revenu,
+    statut,
+    partenaireId: statut === 'couple' ? partenaireUser.id : null
+  });
+
+  if (statut === 'couple') {
+    const envoyeEnDm = await envoyerInvitationCouple(interaction, partenaireUser);
+    return repondre(interaction, embeds.succes(
+      'Profil enregistré',
+      `**Revenu :** ${formatMontant(revenu, config.devise)} / semaine\n\n` +
+      `💌 Invitation de couple envoyée à ${partenaireUser} — en attente de sa confirmation.\n` +
+      `La réduction s'appliquera une fois qu'il/elle aura accepté.` +
+      (envoyeEnDm ? '' : "\n⚠️ Je n'ai pas pu lui envoyer de message privé (DMs fermés) ; l'invitation a été postée dans ce salon à la place.")
     ));
   }
 
-  const user = db.setUserProfil(interaction.guild.id, interaction.user.id, {
-    revenu,
-    statut,
-    partenaire: partenaire || null
-  });
+  const user = db.getUser(guildId, interaction.user.id);
   const impot = calculerImpotHebdomadaire(user, config);
 
   return repondre(interaction, embeds.succes(
     'Profil fiscal mis à jour',
     `**Revenu :** ${formatMontant(revenu, config.devise)} / semaine\n` +
-    `**Statut :** ${statut}${partenaire ? ` avec ${partenaire}` : ''}\n` +
+    `**Statut :** seul\n` +
     `**Impôt à payer / semaine :** ${formatMontant(impot, config.devise)}\n\n` +
     "Utilise `/dimpots` chaque semaine pour déclarer ton paiement."
   ));
+}
+
+async function envoyerInvitationCouple(interaction, partenaireUser) {
+  const guildId = interaction.guild.id;
+  const inviteurId = interaction.user.id;
+
+  const ligne = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`couple_accept_${guildId}_${inviteurId}_${partenaireUser.id}`)
+      .setLabel('Accepter')
+      .setStyle(ButtonStyle.Success),
+    new ButtonBuilder()
+      .setCustomId(`couple_decline_${guildId}_${inviteurId}_${partenaireUser.id}`)
+      .setLabel('Refuser')
+      .setStyle(ButtonStyle.Danger)
+  );
+
+  const embed = embeds.info(
+    '💌 Invitation de couple',
+    `${interaction.user} veut te mettre comme partenaire pour ses impôts sur **${interaction.guild.name}**.\n` +
+    "Si tu acceptes, vous obtenez tous les deux une réduction sur vos impôts hebdomadaires."
+  );
+
+  try {
+    await partenaireUser.send({ embeds: [embed], components: [ligne] });
+    return true;
+  } catch {
+    await interaction.channel.send({ content: `${partenaireUser}`, embeds: [embed], components: [ligne] }).catch(() => {});
+    return false;
+  }
 }
 
 function appliquerCode(interaction, config) {

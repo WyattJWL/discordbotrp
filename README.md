@@ -37,7 +37,7 @@ Toutes les réponses sont éphémères (privées, visibles seulement par la pers
 
 | Commande | Description |
 |---|---|
-| `/cimpots configurer revenu:<nombre> statut:<seul\|couple> [partenaire:<nom>]` | Configure ton revenu hebdomadaire et ton statut. Calcule et affiche le montant d'impôt à payer par semaine. |
+| `/cimpots configurer revenu:<nombre> statut:<seul\|couple> [partenaire:<@membre>]` | Configure ton revenu hebdomadaire et ton statut. En couple, envoie une invitation au/à la partenaire choisi(e) — la réduction ne s'applique qu'une fois acceptée. |
 | `/cimpots profil` | Affiche ton profil fiscal actuel (revenu, statut, réduction, montant dû, total déclaré). |
 | `/cimpots code code:<CODE>` | Utilise un code promo pour obtenir une réduction sur tes impôts. |
 | `/dimpots` | Déclare le paiement de tes impôts de la semaine (le montant s'ajoute à ton total déclaré). |
@@ -62,28 +62,31 @@ Toutes les réponses sont éphémères (privées, visibles seulement par la pers
 
 ## Calcul de l'impôt — à personnaliser
 
-Le calcul est **progressif par tranches**, configurable dans `config.json` sans toucher au code :
+Le taux est **fixe**, configurable dans `config.json` sans toucher au code :
 
 ```json
 {
   "impots": {
-    "tranches": [
-      { "jusquA": 100, "taux": 0 },
-      { "jusquA": 300, "taux": 10 },
-      { "jusquA": 600, "taux": 20 },
-      { "jusquA": 1000, "taux": 30 },
-      { "jusquA": null, "taux": 40 }
-    ],
+    "tauxPourcent": 15,
     "reductionCouplePourcent": 10
   }
 }
 ```
 
-- Chaque tranche de revenu est taxée au taux indiqué (comme un vrai barème progressif). `jusquA: null` = tranche finale sans plafond.
-- `reductionCouplePourcent` : réduction appliquée en plus si le statut est `couple`.
+- `tauxPourcent` : pourcentage appliqué directement au revenu hebdomadaire déclaré (15% par défaut).
+- `reductionCouplePourcent` : réduction supplémentaire appliquée une fois que les deux partenaires ont confirmé leur couple.
 - Les codes promo appliquent une réduction supplémentaire par-dessus.
 
-**Ce sont des valeurs d'exemple** — ajuste les tranches, les taux et la réduction couple selon ce que tu veux pour l'organisation.
+## Le système de couple
+
+Pour éviter qu'on invente un faux partenaire juste pour la réduction, la mise en couple passe par une confirmation :
+
+1. `/cimpots configurer revenu:... statut:couple partenaire:@membre` enregistre ton revenu et envoie une **invitation en message privé** au/à la partenaire choisi(e) (si ses DMs sont fermés, l'invitation est postée dans le salon à la place).
+2. Le/la partenaire reçoit deux boutons **Accepter** / **Refuser**.
+3. S'il/elle accepte : les deux comptes passent en couple confirmé, et la réduction `reductionCouplePourcent` s'applique aux deux. L'inviteur est prévenu en DM.
+4. S'il/elle refuse : l'inviteur repasse en statut `seul`, aussi prévenu en DM.
+
+Tant que ce n'est pas confirmé, `/cimpots profil` affiche "en attente de confirmation" et la réduction ne s'applique pas. Le nom affiché pour le/la partenaire (et partout ailleurs) est le pseudo du serveur — généralement le nom de personnage RP.
 
 ## Notes / choix faits
 

@@ -19,7 +19,7 @@ for (const file of fs.readdirSync(commandsPath).filter((f) => f.endsWith('.js'))
   client.commands.set(command.data.name, command);
 }
 
-client.once('ready', () => {
+client.once('clientReady', () => {
   console.log(`Connecté en tant que ${client.user.tag}`);
   console.log(`${client.commands.size} commandes chargées : ${[...client.commands.keys()].join(', ')}`);
   client.user.setActivity('Sangre Negra RP', { type: ActivityType.Watching });

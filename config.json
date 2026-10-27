@@ -1,0 +1,13 @@
+{
+  "devise": "€",
+  "impots": {
+    "tranches": [
+      { "jusquA": 100, "taux": 0 },
+      { "jusquA": 300, "taux": 10 },
+      { "jusquA": 600, "taux": 20 },
+      { "jusquA": 1000, "taux": 30 },
+      { "jusquA": null, "taux": 40 }
+    ],
+    "reductionCouplePourcent": 10
+  }
+}

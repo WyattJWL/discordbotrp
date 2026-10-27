@@ -1,5 +1,6 @@
 'use strict';
 
+const { MessageFlags } = require('discord.js');
 const db = require('./db');
 const embeds = require('./embeds');
 const { obtenirNomAffichage } = require('./util');
@@ -9,7 +10,7 @@ async function gererBouton(interaction) {
   if (prefixe !== 'couple') return;
 
   if (interaction.user.id !== partenaireId) {
-    return interaction.reply({ content: "Cette invitation ne t'est pas destinée.", ephemeral: true });
+    return interaction.reply({ content: "Cette invitation ne t'est pas destinée.", flags: MessageFlags.Ephemeral });
   }
 
   const nomInviteur = await obtenirNomAffichage(interaction.client, guildId, inviteurId);

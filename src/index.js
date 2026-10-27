@@ -3,7 +3,7 @@
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { Client, GatewayIntentBits, Collection, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, ActivityType, MessageFlags } = require('discord.js');
 
 const config = require(path.join(__dirname, '..', 'config.json'));
 const { gererBouton } = require('./boutons');
@@ -35,7 +35,7 @@ client.on('interactionCreate', async (interaction) => {
       await command.execute(interaction, config, client.commands);
     } catch (err) {
       console.error(`Erreur dans la commande ${interaction.commandName} :`, err);
-      const payload = { content: 'Une erreur est survenue en exécutant cette commande.', ephemeral: true };
+      const payload = { content: 'Une erreur est survenue en exécutant cette commande.', flags: MessageFlags.Ephemeral };
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp(payload).catch(() => {});
       } else {

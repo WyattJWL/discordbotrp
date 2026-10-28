@@ -4,6 +4,8 @@ const { obtenirCandidature, supprimerCandidature, marquerVue, definirStatut } = 
 const { exigerStaff } = require('../lib/proteger');
 const { echapperHtml } = require('../lib/util');
 const { page } = require('../lib/layout');
+const { ajouterRole } = require('../lib/discord-api');
+const { ROLE_RECRUE } = require('../lib/autorisation');
 
 const LIBELLES = {
   discord: 'Pseudo Discord',
@@ -65,11 +67,26 @@ module.exports = async (req, res) => {
       return;
     }
 
+    let roleInfo = '';
     if (action === 'statut') {
-      await definirStatut(id, params.get('statut'), params.get('note'));
+      const statut = params.get('statut');
+      await definirStatut(id, statut, params.get('note'));
+
+      if (statut === 'acceptee') {
+        const candidature = await obtenirCandidature(id);
+        if (candidature?.candidatUserId) {
+          try {
+            await ajouterRole(process.env.DISCORD_GUILD_ID, candidature.candidatUserId, ROLE_RECRUE);
+            roleInfo = '?role=ok';
+          } catch (err) {
+            console.error('Attribution du rôle Recrue échouée :', err);
+            roleInfo = '?role=echec';
+          }
+        }
+      }
     }
 
-    res.writeHead(302, { Location: `/candidature/${id}` });
+    res.writeHead(302, { Location: `/candidature/${id}${roleInfo}` });
     res.end();
     return;
   }
@@ -84,6 +101,14 @@ module.exports = async (req, res) => {
   }
 
   await marquerVue(id);
+
+  const roleParam = new URL(req.url, 'http://x').searchParams.get('role');
+  let noticeRole = '';
+  if (roleParam === 'ok') {
+    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ Rôle <b>Recrue</b> attribué automatiquement sur Discord.</div></div>`;
+  } else if (roleParam === 'echec') {
+    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(255,138,138,0.4)"><div class="valeur">⚠️ Le rôle Recrue n'a pas pu être attribué automatiquement (vérifie que le bot a la permission Gérer les rôles et qu'il est placé au-dessus du rôle Recrue). Attribue-le manuellement.</div></div>`;
+  }
 
   const date = new Date(candidature.creeAt).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
 
@@ -106,6 +131,8 @@ module.exports = async (req, res) => {
     <div class="eyebrow"><a href="/staff" style="color:inherit; text-decoration:none">← Candidatures</a></div>
     <h1 class="titre">Candidature de <span>${echapperHtml(candidature.reponses.nomPersonnage || '?')}</span></h1>
     <p class="texte-intro">Reçue le ${date} · ${candidature.vue ? `vue le ${new Date(candidature.vueAt).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}` : 'première consultation'}</p>
+
+    ${noticeRole}
 
     <div class="mini-carte" style="margin-bottom:22px">
       <div class="label">Décision</div>

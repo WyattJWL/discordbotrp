@@ -4,57 +4,52 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sangre Negra</title>
-<style>
-  :root {
-    --fond: #0b0909; --panneau: #151010; --bordure: #2a1a1a;
-    --texte: #ece6e6; --texte-faible: #a89a9a; --accent-vif: #e8304f;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: radial-gradient(ellipse at top, #1a0f0f 0%, var(--fond) 55%);
-    color: var(--texte);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px 16px;
-  }
-  .conteneur { max-width: 420px; width: 100%; text-align: center; }
-  .logo { font-size: 13px; letter-spacing: 4px; color: var(--accent-vif); text-transform: uppercase; margin-bottom: 8px; }
-  h1 { font-size: 30px; margin: 0 0 30px; }
-  .liens { display: flex; flex-direction: column; gap: 12px; }
-  a.lien {
-    display: block;
-    background: var(--panneau); border: 1px solid var(--bordure); border-radius: 10px;
-    padding: 15px; color: var(--texte); text-decoration: none; font-weight: 600; font-size: 14.5px;
-  }
-  a.lien.principal { background: #c81e3a; border-color: #c81e3a; }
-  .etat { color: var(--texte-faible); font-size: 13px; margin-bottom: 20px; min-height: 18px; }
-  .etat a { color: var(--accent-vif); }
-</style>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<div class="conteneur">
-  <div class="logo">Sangre Negra</div>
-  <h1>Organisation RP</h1>
-  <div class="etat" id="etat"></div>
-  <div class="liens" id="liens"></div>
+<div class="topnav">
+  <div class="marque">
+    <div class="ecusson">SN</div>
+    <div>
+      <div class="nom">SANGRE <span>NEGRA</span></div>
+      <div class="sous">Organisation RP</div>
+    </div>
+  </div>
+  <div class="droite" id="zoneDroite"></div>
 </div>
+
+<div class="page-centree">
+  <div class="carte-accent" style="text-align:center">
+    <div class="badge-pill">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4Z"/></svg>
+      Organisation
+    </div>
+    <h1 class="titre">Bienvenue chez <span>Sangre Negra</span></h1>
+    <p class="texte-intro" id="texteIntro">Connecte-toi avec Discord pour accéder à tes espaces.</p>
+    <div id="liens" style="display:flex; flex-direction:column; gap:10px; margin-top:22px"></div>
+  </div>
+</div>
+
 <script>
+function iconeDiscord() {
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 5.4A18 18 0 0 0 15.9 4l-.3.6c1.8.5 2.9 1.2 4 2a14 14 0 0 0-12.9 0c1.1-.8 2.4-1.5 4-2L10.4 4a18 18 0 0 0-4.4 1.4C3 10 2.2 14.5 2.6 19a18 18 0 0 0 5.4 2.7l.9-1.4a12 12 0 0 1-1.9-.9l.5-.4a13 13 0 0 0 10.8 0l.5.4c-.6.3-1.2.6-1.9.9l.9 1.4A18 18 0 0 0 21.4 19c.5-5.2-.8-9.6-3.1-13.6ZM9.7 16.4c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Zm6.6 0c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Z"/></svg>';
+}
+
 fetch('/api/whoami').then((r) => r.json()).then((info) => {
-  const etat = document.getElementById('etat');
+  const zoneDroite = document.getElementById('zoneDroite');
   const liens = document.getElementById('liens');
+  const texte = document.getElementById('texteIntro');
 
   if (info.connecte) {
-    etat.innerHTML = 'Connecté en tant que <b>' + info.username + '</b> · <a href="/api/auth/logout">déconnexion</a>';
+    zoneDroite.innerHTML = `<div class="avatar">${info.username[0].toUpperCase()}</div><span>${info.username}</span><a href="/api/auth/logout">Déconnexion</a>`;
+    texte.textContent = 'Accède à ton espace ou à la gestion du staff.';
     liens.innerHTML = `
-      <a class="lien principal" href="/espace">Mon espace</a>
-      <a class="lien" href="/staff">Espace staff</a>
-      <a class="lien" href="/candidature">Postuler / parrainer quelqu'un</a>
+      <a class="btn btn-accent btn-large" href="/espace">Mon espace</a>
+      <a class="btn btn-ghost btn-large" href="/staff">Espace staff</a>
+      <a class="btn btn-ghost btn-large" href="/candidature">Postuler</a>
     `;
   } else {
-    etat.textContent = '';
-    liens.innerHTML = `<a class="lien principal" href="/candidature">Postuler</a>`;
+    liens.innerHTML = `<a class="btn btn-discord btn-large" href="/api/auth/login">${iconeDiscord()} Se connecter avec Discord</a>`;
   }
 });
 </script>

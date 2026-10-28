@@ -161,6 +161,27 @@ h1.titre span { color: var(--accent-vif); }
 .liste-item .fleche { color: var(--accent-vif); font-size: 18px; }
 .vide { color: var(--texte-faible); font-size: 14px; }
 
+.radios { display: flex; gap: 8px; flex-wrap: wrap; }
+.radios label {
+  flex: 1; min-width: 110px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  font-weight: 600; font-size: 13px;
+  background: #1b1414; border: 1px solid var(--bordure); border-radius: 9px;
+  padding: 10px; cursor: pointer; margin: 0;
+}
+.radios input { accent-color: var(--accent-vif); }
+.radios label:has(input:checked) { border-color: var(--accent-vif); background: rgba(200, 30, 58, 0.12); }
+
+.statut-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid;
+}
+.statut-en_attente { color: #a89a9a; border-color: #3a3030; background: rgba(168,154,154,0.08); }
+.statut-acceptee { color: #5fe08a; border-color: rgba(95,224,138,0.4); background: rgba(95,224,138,0.1); }
+.statut-refusee { color: #ff8a8a; border-color: rgba(255,138,138,0.4); background: rgba(255,138,138,0.1); }
+.statut-corrections { color: #f5b35c; border-color: rgba(245,179,92,0.4); background: rgba(245,179,92,0.1); }
+
 .alerte {
   display: none;
   background: #2a1313; border: 1px solid #5a2222; color: #ff8a8a;

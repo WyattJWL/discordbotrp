@@ -1,6 +1,8 @@
 'use strict';
 
 const { lireCookies, lireSession } = require('../lib/session');
+const { estMembreGang, estStaff } = require('../lib/autorisation');
+const { trouverCandidaturePourUtilisateur } = require('../lib/candidatures');
 
 module.exports = async (req, res) => {
   const cookies = lireCookies(req);
@@ -11,5 +13,18 @@ module.exports = async (req, res) => {
     res.status(200).json({ connecte: false });
     return;
   }
-  res.status(200).json({ connecte: true, username: session.username });
+
+  const [membre, staff, candidature] = await Promise.all([
+    estMembreGang(session.userId),
+    estStaff(session.userId),
+    trouverCandidaturePourUtilisateur(session.userId)
+  ]);
+
+  res.status(200).json({
+    connecte: true,
+    username: session.username,
+    estMembre: membre,
+    estStaff: staff,
+    aPostule: !!candidature
+  });
 };

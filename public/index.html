@@ -42,12 +42,21 @@ fetch('/api/whoami').then((r) => r.json()).then((info) => {
 
   if (info.connecte) {
     zoneDroite.innerHTML = `<div class="avatar">${info.username[0].toUpperCase()}</div><span>${info.username}</span><a href="/api/auth/logout">Déconnexion</a>`;
-    texte.textContent = 'Accède à ton espace ou à la gestion du staff.';
-    liens.innerHTML = `
-      <a class="btn btn-accent btn-large" href="/espace">Mon espace</a>
-      <a class="btn btn-ghost btn-large" href="/staff">Espace staff</a>
-      <a class="btn btn-ghost btn-large" href="/candidature">Postuler</a>
-    `;
+
+    if (info.estMembre) {
+      texte.textContent = 'Accède à ton espace ou à la gestion du staff.';
+      liens.innerHTML = `
+        <a class="btn btn-accent btn-large" href="/espace">Mon espace</a>
+        ${info.estStaff ? '<a class="btn btn-ghost btn-large" href="/staff">Espace staff</a>' : ''}
+        <a class="btn btn-ghost btn-large" href="/candidature">Parrainer quelqu'un</a>
+      `;
+    } else if (info.aPostule) {
+      texte.textContent = 'Ta candidature est en cours de traitement.';
+      liens.innerHTML = `<a class="btn btn-accent btn-large" href="/suivre">Suivre ma candidature</a>`;
+    } else {
+      texte.textContent = 'Tu veux rejoindre l\'organisation ?';
+      liens.innerHTML = `<a class="btn btn-accent btn-large" href="/candidature">Postuler</a>`;
+    }
   } else {
     liens.innerHTML = `<a class="btn btn-discord btn-large" href="/api/auth/login">${iconeDiscord()} Se connecter avec Discord</a>`;
   }

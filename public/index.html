@@ -51,7 +51,13 @@ fetch('/api/whoami').then((r) => r.json()).then((info) => {
         <a class="btn btn-ghost btn-large" href="/candidature">Parrainer quelqu'un</a>
       `;
     } else if (info.aPostule) {
-      texte.textContent = 'Ta candidature est en cours de traitement.';
+      const messages = {
+        en_attente: 'Ta candidature est en cours de traitement.',
+        acceptee: 'Ta candidature a été acceptée ! Un membre du staff va te donner accès sur Discord.',
+        refusee: 'Ta candidature a été refusée.',
+        corrections: 'Des corrections sont demandées sur ta candidature.'
+      };
+      texte.textContent = messages[info.statutCandidature] || messages.en_attente;
       liens.innerHTML = `<a class="btn btn-accent btn-large" href="/suivre">Suivre ma candidature</a>`;
     } else {
       texte.textContent = 'Tu veux rejoindre l\'organisation ?';

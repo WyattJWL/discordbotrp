@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
     username: session.username,
     estMembre: membre,
     estStaff: staff,
-    aPostule: !!candidature
+    aPostule: !!candidature,
+    statutCandidature: candidature ? candidature.statut : null
   });
 };

@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/candidature/:id", "destination": "/api/voir-candidature?id=:id" },
-    { "source": "/staff", "destination": "/api/staff" }
+    { "source": "/staff", "destination": "/api/staff" },
+    { "source": "/espace", "destination": "/api/espace" }
   ]
 }

@@ -3,9 +3,10 @@
 const { creerCandidature } = require('../lib/candidatures');
 const { envoyerMessageSalon } = require('../lib/discord-api');
 const { charger: chargerDb, getGuild } = require('../lib/db');
+const { exigerConnexion } = require('../lib/proteger');
 
 const CHAMPS_REQUIS = [
-  'discord', 'majeur', 'experience', 'heures',
+  'majeur', 'experience', 'heures',
   'nomPersonnage', 'histoire', 'motivation', 'apport', 'miseEnSituation'
 ];
 
@@ -23,6 +24,9 @@ module.exports = async (req, res) => {
     res.status(405).send('Method Not Allowed');
     return;
   }
+
+  const session = await exigerConnexion(req, res);
+  if (!session) return;
 
   let reponses;
   try {
@@ -44,12 +48,12 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const propre = {};
+  const propre = { discord: session.username };
   for (const [cle, valeur] of Object.entries(reponses)) {
     propre[cle] = typeof valeur === 'string' ? valeur.trim().slice(0, 2000) : valeur;
   }
 
-  const id = await creerCandidature(propre);
+  const id = await creerCandidature(propre, session.userId, session.username);
 
   try {
     const guildId = process.env.DISCORD_GUILD_ID;
@@ -63,7 +67,7 @@ module.exports = async (req, res) => {
           color: 0xc81e3a,
           title: '📋 Nouvelle candidature',
           description:
-            `**Pseudo Discord :** ${propre.discord}\n` +
+            `**Discord :** <@${session.userId}> (${propre.discord})\n` +
             `**Personnage :** ${propre.nomPersonnage}\n\n` +
             `[Voir la candidature complète](${urlVoir})`,
           timestamp: new Date().toISOString()

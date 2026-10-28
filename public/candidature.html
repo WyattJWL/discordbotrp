@@ -159,6 +159,20 @@
   .confirmation h2 { border: none; padding: 0; color: var(--texte); font-size: 20px; text-transform: none; letter-spacing: 0; }
   .confirmation p { color: var(--texte-faible); font-size: 14px; line-height: 1.6; }
   footer { text-align: center; margin-top: 26px; color: #5a4e4e; font-size: 11.5px; }
+  .porte { text-align: center; padding: 50px 10px; }
+  .porte p { color: var(--texte-faible); font-size: 14px; margin-bottom: 22px; line-height: 1.6; }
+  .btn-discord {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #5865f2; color: #fff; text-decoration: none;
+    padding: 13px 22px; border-radius: 10px; font-weight: 700; font-size: 14.5px;
+  }
+  .connecte {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--panneau); border: 1px solid var(--bordure); border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 20px; font-size: 13px; color: var(--texte-faible);
+  }
+  .connecte b { color: var(--texte); }
+  .connecte a { color: var(--accent-vif); text-decoration: none; }
 </style>
 </head>
 <body>
@@ -169,16 +183,19 @@
     <p>Tu veux rejoindre l'organisation ? Réponds honnêtement à ce questionnaire.<br>Prends ton temps — la qualité de tes réponses compte plus que la vitesse.</p>
   </header>
 
+  <div class="porte" id="porte" style="display:none">
+    <p>Connecte-toi avec Discord pour postuler.<br>Ça évite d'avoir à taper ton pseudo à la main, et ça confirme que c'est bien toi.</p>
+    <a class="btn-discord" id="lienConnexion" href="#">Se connecter avec Discord</a>
+  </div>
+
+  <div id="zoneFormulaire" style="display:none">
+  <div class="connecte"><span>Connecté en tant que <b id="pseudoConnecte"></b></span><a href="/api/auth/logout">déconnexion</a></div>
+
   <div class="erreur" id="erreur"></div>
 
   <form id="formulaire">
     <div class="panneau">
       <h2>Informations</h2>
-      <div class="champ">
-        <label>Pseudo Discord exact <span class="req">*</span></label>
-        <div class="aide">Ton nom d'utilisateur Discord, pas ton pseudo du serveur.</div>
-        <input type="text" name="discord" required>
-      </div>
       <div class="champ">
         <label>As-tu 18 ans ou plus ? <span class="req">*</span></label>
         <div class="radios">
@@ -256,11 +273,23 @@
     <h2>Candidature envoyée</h2>
     <p>Merci. Les admins ont été prévenus et reviendront vers toi sur Discord.</p>
   </div>
+  </div>
 
   <footer>Sangre Negra RP</footer>
 </div>
 
 <script>
+document.getElementById('lienConnexion').href = '/api/auth/login?retour=' + encodeURIComponent('/candidature');
+
+fetch('/api/whoami').then((r) => r.json()).then((info) => {
+  if (info.connecte) {
+    document.getElementById('pseudoConnecte').textContent = info.username;
+    document.getElementById('zoneFormulaire').style.display = 'block';
+  } else {
+    document.getElementById('porte').style.display = 'block';
+  }
+});
+
 const formulaire = document.getElementById('formulaire');
 const erreur = document.getElementById('erreur');
 const btn = document.getElementById('btnEnvoyer');

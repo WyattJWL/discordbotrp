@@ -1,6 +1,6 @@
 'use strict';
 
-const { obtenirCandidature } = require('../lib/candidatures');
+const { obtenirCandidature, supprimerCandidature } = require('../lib/candidatures');
 const { exigerStaff } = require('../lib/proteger');
 
 const LIBELLES = {
@@ -49,6 +49,7 @@ function page(corps) {
   .meta { color:#a89a9a; font-size:12.5px; margin-bottom:18px; }
   .nav { display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:#a89a9a; margin-bottom:18px; }
   .nav a { color:#e8304f; text-decoration:none; }
+  .supprimer { background:#2a1313; border:1px solid #5a2222; color:#ff8a8a; border-radius:8px; padding:10px 16px; font-size:13px; cursor:pointer; width:100%; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -59,6 +60,15 @@ ${corps}
 </html>`;
 }
 
+function lireCorpsBrut(req) {
+  return new Promise((resolve, reject) => {
+    const morceaux = [];
+    req.on('data', (chunk) => morceaux.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(morceaux)));
+    req.on('error', reject);
+  });
+}
+
 module.exports = async (req, res) => {
   const session = await exigerStaff(req, res);
   if (!session) return;
@@ -67,6 +77,16 @@ module.exports = async (req, res) => {
 
   if (!id) {
     res.status(400).send(page('<p>ID manquant.</p>'));
+    return;
+  }
+
+  if (req.method === 'POST') {
+    const corps = (await lireCorpsBrut(req)).toString('utf8');
+    if (new URLSearchParams(corps).get('_action') === 'supprimer') {
+      await supprimerCandidature(id);
+    }
+    res.writeHead(302, { Location: '/staff' });
+    res.end();
     return;
   }
 
@@ -93,6 +113,10 @@ module.exports = async (req, res) => {
     <h1>Candidature Sangre Negra</h1>
     <div class="meta">Reçue le ${date}</div>
     ${cartes}
+    <form method="POST" onsubmit="return confirm('Supprimer définitivement cette candidature ?')">
+      <input type="hidden" name="_action" value="supprimer">
+      <button type="submit" class="supprimer">Supprimer cette candidature</button>
+    </form>
   `;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');

@@ -5,6 +5,7 @@
     { "source": "/staff", "destination": "/api/staff" },
     { "source": "/espace", "destination": "/api/espace" },
     { "source": "/suivre", "destination": "/api/suivre" },
+    { "source": "/rejoindre/:id", "destination": "/api/suivre?rejoindre=:id" },
     { "source": "/membres", "destination": "/api/membres" },
     { "source": "/notes", "destination": "/api/notes" },
     { "source": "/notes/:id", "destination": "/api/notes?id=:id" },

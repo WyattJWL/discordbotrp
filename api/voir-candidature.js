@@ -4,8 +4,28 @@ const { obtenirCandidature, supprimerCandidature, marquerVue, definirStatut } = 
 const { exigerStaff } = require('../lib/proteger');
 const { echapperHtml } = require('../lib/util');
 const { page } = require('../lib/layout');
-const { ajouterRole } = require('../lib/discord-api');
-const { ROLE_RECRUE } = require('../lib/autorisation');
+const { envoyerDM } = require('../lib/discord-api');
+const embeds = require('../lib/embeds');
+
+const MESSAGES_STATUT = {
+  acceptee: (candidature, lien) => embeds.succes(
+    '🎉 Candidature acceptée !',
+    `Ta candidature pour rejoindre **Sangre Negra** a été acceptée.` +
+    (candidature.noteStaff ? `\n\n**Message du staff :** ${candidature.noteStaff}` : '') +
+    `\n\nClique ci-dessous pour accepter les conditions et finaliser ton arrivée :\n${lien}`
+  ),
+  refusee: (candidature) => embeds.erreur(
+    'Candidature refusée',
+    `Ta candidature pour rejoindre **Sangre Negra** a été refusée.` +
+    (candidature.noteStaff ? `\n\n**Message du staff :** ${candidature.noteStaff}` : '')
+  ),
+  corrections: (candidature) => embeds.attention(
+    'Corrections demandées',
+    `Le staff a demandé des corrections sur ta candidature pour **Sangre Negra**.` +
+    (candidature.noteStaff ? `\n\n**Message du staff :** ${candidature.noteStaff}` : '') +
+    `\n\nTu peux repostuler avec une nouvelle candidature une fois corrigée.`
+  )
+};
 
 const LIBELLES = {
   discord: 'Pseudo Discord',
@@ -72,15 +92,17 @@ module.exports = async (req, res) => {
       const statut = params.get('statut');
       await definirStatut(id, statut, params.get('note'));
 
-      if (statut === 'acceptee') {
+      const fabriqueMessage = MESSAGES_STATUT[statut];
+      if (fabriqueMessage) {
         const candidature = await obtenirCandidature(id);
         if (candidature?.candidatUserId) {
           try {
-            await ajouterRole(process.env.DISCORD_GUILD_ID, candidature.candidatUserId, ROLE_RECRUE);
-            roleInfo = '?role=ok';
+            const lien = statut === 'acceptee' ? `https://${req.headers.host}/rejoindre/${id}` : null;
+            await envoyerDM(candidature.candidatUserId, { embeds: [fabriqueMessage(candidature, lien)] });
+            roleInfo = '?dm=ok';
           } catch (err) {
-            console.error('Attribution du rôle Recrue échouée :', err);
-            roleInfo = '?role=echec';
+            console.error('DM de notification échoué :', err);
+            roleInfo = '?dm=echec';
           }
         }
       }
@@ -102,12 +124,12 @@ module.exports = async (req, res) => {
 
   await marquerVue(id);
 
-  const roleParam = new URL(req.url, 'http://x').searchParams.get('role');
+  const dmParam = new URL(req.url, 'http://x').searchParams.get('dm');
   let noticeRole = '';
-  if (roleParam === 'ok') {
-    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ Rôle <b>Recrue</b> attribué automatiquement sur Discord.</div></div>`;
-  } else if (roleParam === 'echec') {
-    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(255,138,138,0.4)"><div class="valeur">⚠️ Le rôle Recrue n'a pas pu être attribué automatiquement (vérifie que le bot a la permission Gérer les rôles et qu'il est placé au-dessus du rôle Recrue). Attribue-le manuellement.</div></div>`;
+  if (dmParam === 'ok') {
+    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ Message privé envoyé au candidat pour l'informer.</div></div>`;
+  } else if (dmParam === 'echec') {
+    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(255,138,138,0.4)"><div class="valeur">⚠️ Impossible d'envoyer un message privé au candidat (DMs peut-être fermés). Préviens-le autrement.</div></div>`;
   }
 
   const date = new Date(candidature.creeAt).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });

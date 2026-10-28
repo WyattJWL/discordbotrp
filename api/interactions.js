@@ -15,7 +15,7 @@ function lireCorpsBrut(req) {
   });
 }
 
-module.exports = async (req, res) => {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;
@@ -25,13 +25,19 @@ module.exports = async (req, res) => {
   const timestamp = req.headers['x-signature-timestamp'];
   const corpsBrut = await lireCorpsBrut(req);
 
-  const estValide = signature && timestamp && verifyKey(corpsBrut, signature, timestamp, PUBLIC_KEY);
+  const estValide = signature && timestamp && (await verifyKey(corpsBrut, signature, timestamp, PUBLIC_KEY));
   if (!estValide) {
     res.status(401).send('Signature invalide');
     return;
   }
 
-  const interaction = JSON.parse(corpsBrut.toString('utf8'));
+  let interaction;
+  try {
+    interaction = JSON.parse(corpsBrut.toString('utf8'));
+  } catch {
+    res.status(400).send('Corps JSON invalide');
+    return;
+  }
 
   if (interaction.type === 1) {
     res.status(200).json({ type: 1 });
@@ -58,5 +64,12 @@ module.exports = async (req, res) => {
       type: 4,
       data: { content: 'Une erreur est survenue en exécutant cette commande.', flags: 64 }
     });
+  }
+}
+
+module.exports = handler;
+module.exports.config = {
+  api: {
+    bodyParser: false
   }
 };

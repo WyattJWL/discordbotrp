@@ -4,6 +4,13 @@
     { "source": "/candidature/:id", "destination": "/api/voir-candidature?id=:id" },
     { "source": "/staff", "destination": "/api/staff" },
     { "source": "/espace", "destination": "/api/espace" },
-    { "source": "/suivre", "destination": "/api/suivre" }
+    { "source": "/suivre", "destination": "/api/suivre" },
+    { "source": "/membres", "destination": "/api/membres" },
+    { "source": "/notes", "destination": "/api/notes" },
+    { "source": "/notes/:id", "destination": "/api/note-detail?id=:id" },
+    { "source": "/operations", "destination": "/api/operations" },
+    { "source": "/operations/:id", "destination": "/api/operation-detail?id=:id" },
+    { "source": "/relations", "destination": "/api/relations" },
+    { "source": "/relations/:id", "destination": "/api/relation-detail?id=:id" }
   ]
 }

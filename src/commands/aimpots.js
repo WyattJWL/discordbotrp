@@ -9,7 +9,7 @@ const { repondre } = require('../reponse');
 
 module.exports = {
   adminOnly: true,
-  usage: '/aimpots reset|ajouter|retirer|telephone|voir|liste',
+  usage: '/aimpots reset|ajouter|retirer|telephone|canalcandidatures|voir|liste',
   description: "[Admin] Gérer manuellement les impôts des membres (reset, correction, téléphone, vue d'ensemble).",
   data: new SlashCommandBuilder()
     .setName('aimpots')
@@ -33,6 +33,10 @@ module.exports = {
       .setName('telephone')
       .setDescription('Configurer le numéro affiché par /himpot.')
       .addStringOption((opt) => opt.setName('numero').setDescription('Le numéro à afficher').setRequired(true)))
+    .addSubcommand((sub) => sub
+      .setName('canalcandidatures')
+      .setDescription('Configurer le salon qui reçoit les nouvelles candidatures.')
+      .addChannelOption((opt) => opt.setName('salon').setDescription('Le salon cible').setRequired(true)))
     .addSubcommand((sub) => sub
       .setName('voir')
       .setDescription("Voir le profil fiscal complet d'un membre.")

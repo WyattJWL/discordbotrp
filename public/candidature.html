@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Candidature — Sangre Negra</title>
+<style>
+  :root {
+    --fond: #0b0909;
+    --panneau: #151010;
+    --bordure: #2a1a1a;
+    --texte: #ece6e6;
+    --texte-faible: #a89a9a;
+    --accent: #c81e3a;
+    --accent-vif: #e8304f;
+    --succes: #3ba55d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at top, #1a0f0f 0%, var(--fond) 55%);
+    color: var(--texte);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  .conteneur { max-width: 640px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 28px; }
+  header .logo {
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--accent-vif);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0 0 10px;
+    letter-spacing: 1px;
+  }
+  header p {
+    color: var(--texte-faible);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .panneau {
+    background: var(--panneau);
+    border: 1px solid var(--bordure);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 18px;
+  }
+  .panneau h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent-vif);
+    margin: 0 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--bordure);
+  }
+  label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  label .req { color: var(--accent-vif); margin-left: 2px; }
+  .aide {
+    font-size: 12.5px;
+    color: var(--texte-faible);
+    margin: -2px 0 8px;
+    line-height: 1.5;
+  }
+  .champ { margin-bottom: 20px; }
+  .champ:last-child { margin-bottom: 0; }
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: #1d1515;
+    border: 1px solid var(--bordure);
+    border-radius: 8px;
+    color: var(--texte);
+    padding: 11px 12px;
+    font-size: 14.5px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea { min-height: 90px; }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-vif);
+  }
+  .radios { display: flex; gap: 10px; }
+  .radios label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    background: #1d1515;
+    border: 1px solid var(--bordure);
+    border-radius: 8px;
+    padding: 11px;
+    cursor: pointer;
+    margin: 0;
+  }
+  .radios input { accent-color: var(--accent-vif); }
+  .case {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .case input { margin-top: 3px; accent-color: var(--accent-vif); flex-shrink: 0; }
+  button.envoyer {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.envoyer:hover { background: var(--accent-vif); }
+  button.envoyer:disabled { opacity: 0.5; cursor: not-allowed; }
+  .erreur {
+    display: none;
+    background: #2a1313;
+    border: 1px solid #5a2222;
+    color: #ff8a8a;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+  }
+  .confirmation {
+    display: none;
+    text-align: center;
+    padding: 40px 10px;
+  }
+  .confirmation .coche {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--succes);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 28px;
+  }
+  .confirmation h2 { border: none; padding: 0; color: var(--texte); font-size: 20px; text-transform: none; letter-spacing: 0; }
+  .confirmation p { color: var(--texte-faible); font-size: 14px; line-height: 1.6; }
+  footer { text-align: center; margin-top: 26px; color: #5a4e4e; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="conteneur">
+  <header>
+    <div class="logo">Sangre Negra</div>
+    <h1>Candidature</h1>
+    <p>Tu veux rejoindre l'organisation ? Réponds honnêtement à ce questionnaire.<br>Prends ton temps — la qualité de tes réponses compte plus que la vitesse.</p>
+  </header>
+
+  <div class="erreur" id="erreur"></div>
+
+  <form id="formulaire">
+    <div class="panneau">
+      <h2>Informations</h2>
+      <div class="champ">
+        <label>Pseudo Discord exact <span class="req">*</span></label>
+        <div class="aide">Ton nom d'utilisateur Discord, pas ton pseudo du serveur.</div>
+        <input type="text" name="discord" required>
+      </div>
+      <div class="champ">
+        <label>As-tu 18 ans ou plus ? <span class="req">*</span></label>
+        <div class="radios">
+          <label><input type="radio" name="majeur" value="Oui" required> Oui</label>
+          <label><input type="radio" name="majeur" value="Non" required> Non</label>
+        </div>
+      </div>
+      <div class="champ">
+        <label>Expérience en roleplay <span class="req">*</span></label>
+        <div class="aide">Depuis combien de temps, et sur quels serveurs/jeux ?</div>
+        <textarea name="experience" required></textarea>
+      </div>
+      <div class="champ">
+        <label>Disponibilité <span class="req">*</span></label>
+        <div class="aide">Environ combien d'heures par semaine peux-tu jouer ?</div>
+        <input type="text" name="heures" required>
+      </div>
+      <div class="champ">
+        <label>Autre faction / gang actuellement ?</label>
+        <div class="aide">Si oui, laquelle, et es-tu prêt à la quitter pour nous rejoindre ?</div>
+        <textarea name="autreFaction"></textarea>
+      </div>
+    </div>
+
+    <div class="panneau">
+      <h2>Ton personnage</h2>
+      <div class="champ">
+        <label>Nom et prénom du personnage <span class="req">*</span></label>
+        <input type="text" name="nomPersonnage" required>
+      </div>
+      <div class="champ">
+        <label>Histoire du personnage <span class="req">*</span></label>
+        <div class="aide">Qui est-il/elle ? Qu'est-ce qui l'a mené(e) à vouloir rejoindre un cartel ?</div>
+        <textarea name="histoire" required></textarea>
+      </div>
+      <div class="champ">
+        <label>Pourquoi Sangre Negra précisément ? <span class="req">*</span></label>
+        <textarea name="motivation" required></textarea>
+      </div>
+      <div class="champ">
+        <label>Qu'est-ce que tu peux apporter à l'organisation ? <span class="req">*</span></label>
+        <div class="aide">Compétences, business, contacts, expérience particulière...</div>
+        <textarea name="apport" required></textarea>
+      </div>
+    </div>
+
+    <div class="panneau">
+      <h2>Mise en situation</h2>
+      <div class="champ">
+        <label>La police t'arrête avec de la marchandise illégale dans le coffre. Comment réagit ton personnage ? <span class="req">*</span></label>
+        <div class="aide">On évalue ta compréhension du RP, pas la "bonne" réponse.</div>
+        <textarea name="miseEnSituation" required></textarea>
+      </div>
+    </div>
+
+    <div class="panneau">
+      <h2>Engagement</h2>
+      <div class="champ">
+        <label>Comment as-tu connu Sangre Negra ?</label>
+        <input type="text" name="origine">
+      </div>
+      <div class="champ">
+        <label class="case">
+          <input type="checkbox" name="reglement" required>
+          <span>Je confirme avoir lu et compris le règlement du serveur et de l'organisation, et j'accepte de m'y conformer.</span>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="envoyer" id="btnEnvoyer">Envoyer ma candidature</button>
+  </form>
+
+  <div class="confirmation" id="confirmation">
+    <div class="coche">✓</div>
+    <h2>Candidature envoyée</h2>
+    <p>Merci. Les admins ont été prévenus et reviendront vers toi sur Discord.</p>
+  </div>
+
+  <footer>Sangre Negra RP</footer>
+</div>
+
+<script>
+const formulaire = document.getElementById('formulaire');
+const erreur = document.getElementById('erreur');
+const btn = document.getElementById('btnEnvoyer');
+
+formulaire.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  erreur.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours...';
+
+  const donnees = Object.fromEntries(new FormData(formulaire).entries());
+  donnees.majeur = donnees.majeur || 'Non';
+  donnees.reglement = formulaire.reglement.checked;
+
+  try {
+    const res = await fetch('/api/candidature', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(donnees)
+    });
+
+    if (!res.ok) {
+      const texte = await res.text();
+      throw new Error(texte || 'Erreur serveur');
+    }
+
+    formulaire.style.display = 'none';
+    document.getElementById('confirmation').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    erreur.textContent = "Une erreur est survenue : " + err.message + ". Réessaie dans un instant.";
+    erreur.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ma candidature';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+</script>
+</body>
+</html>

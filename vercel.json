@@ -7,10 +7,10 @@
     { "source": "/suivre", "destination": "/api/suivre" },
     { "source": "/membres", "destination": "/api/membres" },
     { "source": "/notes", "destination": "/api/notes" },
-    { "source": "/notes/:id", "destination": "/api/note-detail?id=:id" },
+    { "source": "/notes/:id", "destination": "/api/notes?id=:id" },
     { "source": "/operations", "destination": "/api/operations" },
-    { "source": "/operations/:id", "destination": "/api/operation-detail?id=:id" },
+    { "source": "/operations/:id", "destination": "/api/operations?id=:id" },
     { "source": "/relations", "destination": "/api/relations" },
-    { "source": "/relations/:id", "destination": "/api/relation-detail?id=:id" }
+    { "source": "/relations/:id", "destination": "/api/relations?id=:id" }
   ]
 }

@@ -15,7 +15,26 @@ function lireCorpsBrut(req) {
   });
 }
 
+// TEMPORAIRE : enregistre /ssalon sur le serveur (a supprimer avec la commande).
+async function enregistrerSsalon(res) {
+  const { DISCORD_TOKEN, DISCORD_CLIENT_ID, DISCORD_GUILD_ID } = process.env;
+  const r = await fetch(`https://discord.com/api/v10/applications/${DISCORD_CLIENT_ID}/guilds/${DISCORD_GUILD_ID}/commands`, {
+    method: 'POST',
+    headers: { Authorization: `Bot ${DISCORD_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'ssalon',
+      description: '[Admin] Supprime tous les salons, ne garde que #général.',
+      default_member_permissions: '8'
+    })
+  });
+  res.status(200).send(r.ok ? 'Commande /ssalon enregistree.' : `Echec ${r.status} : ${await r.text()}`);
+}
+
 async function handler(req, res) {
+  if (req.method === 'GET' && req.query?.enregistrer === 'ssalon') {
+    await enregistrerSsalon(res);
+    return;
+  }
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;

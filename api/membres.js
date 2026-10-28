@@ -11,18 +11,25 @@ module.exports = async (req, res) => {
   if (!session) return;
 
   const guildId = process.env.DISCORD_GUILD_ID;
-  const [membres, staff] = await Promise.all([
-    listerMembresGuilde(guildId),
+  const [resultatMembres, staff] = await Promise.all([
+    listerMembresGuilde(guildId).then((membres) => ({ ok: true, membres })).catch((err) => {
+      console.error('Annuaire : échec de la récupération des membres :', err);
+      return { ok: false, membres: [] };
+    }),
     estStaff(session.userId)
   ]);
 
+  const membres = resultatMembres.membres;
   const groupes = RANGS_GANG.map((rang) => ({
     rang,
     membres: membres.filter((m) => (m.roles || []).includes(rang.id))
   })).filter((g) => g.membres.length > 0);
 
-  const corps = groupes.length
-    ? groupes.map((g) => `
+  let corps;
+  if (!resultatMembres.ok) {
+    corps = '<p class="vide">Impossible de récupérer la liste des membres depuis Discord pour le moment. Réessaie dans un instant, ou préviens le staff si ça persiste.</p>';
+  } else if (groupes.length) {
+    corps = groupes.map((g) => `
         <h2>${echapperHtml(g.rang.nom)} <span style="color:var(--texte-faible); font-weight:400">(${g.membres.length})</span></h2>
         <div class="grille-cartes">
           ${g.membres.map((m) => `
@@ -31,8 +38,10 @@ module.exports = async (req, res) => {
             </div>
           `).join('\n')}
         </div>
-      `).join('\n')
-    : '<p class="vide">Aucun membre trouvé.</p>';
+      `).join('\n');
+  } else {
+    corps = '<p class="vide">Aucun membre trouvé.</p>';
+  }
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.status(200).send(page({

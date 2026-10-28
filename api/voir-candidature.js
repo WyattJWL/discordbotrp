@@ -1,6 +1,7 @@
 'use strict';
 
 const { obtenirCandidature } = require('../lib/candidatures');
+const { exigerStaff } = require('../lib/proteger');
 
 const LIBELLES = {
   discord: 'Pseudo Discord',
@@ -46,6 +47,8 @@ function page(corps) {
   .label { font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:#e8304f; margin-bottom:6px; }
   .valeur { font-size:14.5px; line-height:1.6; white-space:pre-wrap; }
   .meta { color:#a89a9a; font-size:12.5px; margin-bottom:18px; }
+  .nav { display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:#a89a9a; margin-bottom:18px; }
+  .nav a { color:#e8304f; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -57,6 +60,9 @@ ${corps}
 }
 
 module.exports = async (req, res) => {
+  const session = await exigerStaff(req, res);
+  if (!session) return;
+
   const id = req.query?.id || new URL(req.url, 'http://x').searchParams.get('id');
 
   if (!id) {
@@ -83,6 +89,7 @@ module.exports = async (req, res) => {
     .join('\n');
 
   const corps = `
+    <div class="nav"><a href="/staff">← Tableau de bord</a><span>Connecté : ${echapperHtml(session.username)} · <a href="/api/auth/logout">déconnexion</a></span></div>
     <h1>Candidature Sangre Negra</h1>
     <div class="meta">Reçue le ${date}</div>
     ${cartes}

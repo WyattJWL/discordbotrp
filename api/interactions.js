@@ -3,6 +3,7 @@
 const { verifyKey } = require('discord-interactions');
 const { gererCommande } = require('../lib/commandes');
 const { gererBouton } = require('../lib/boutons');
+const { gererTemporaire } = require('../lib/temporaire');
 
 const PUBLIC_KEY = process.env.DISCORD_PUBLIC_KEY;
 
@@ -16,6 +17,10 @@ function lireCorpsBrut(req) {
 }
 
 async function handler(req, res) {
+  if (req.method === 'GET') {
+    await gererTemporaire(req, res);
+    return;
+  }
   if (req.method !== 'POST') {
     res.status(405).send('Method Not Allowed');
     return;

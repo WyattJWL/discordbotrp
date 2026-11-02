@@ -5,10 +5,10 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 module.exports = {
   adminOnly: true,
   usage: '/bienvenue membre:<@membre>',
-  description: "[Admin] Accepte la candidature d'un membre et poste le message de bienvenue avec le lien dans ce salon.",
+  description: "[Admin] Accepte une candidature et poste le message de bienvenue ici.",
   data: new SlashCommandBuilder()
     .setName('bienvenue')
-    .setDescription("[Admin] Accepte la candidature d'un membre et poste le message de bienvenue avec le lien dans ce salon.")
+    .setDescription("[Admin] Accepte une candidature et poste le message de bienvenue ici.")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addUserOption((opt) => opt.setName('membre').setDescription('Le membre à accueillir').setRequired(true)),
 

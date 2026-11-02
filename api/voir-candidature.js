@@ -4,7 +4,7 @@ const { obtenirCandidature, supprimerCandidature, marquerVue, definirStatut } = 
 const { exigerStaff } = require('../lib/proteger');
 const { echapperHtml } = require('../lib/util');
 const { page } = require('../lib/layout');
-const { envoyerDM } = require('../lib/discord-api');
+const { envoyerDM, envoyerMessageSalon, trouverSalonParNomRp } = require('../lib/discord-api');
 const embeds = require('../lib/embeds');
 
 const MESSAGES_STATUT = {
@@ -64,6 +64,23 @@ function lireCorpsBrut(req) {
   });
 }
 
+/** DM impossible : on écrit dans le salon qui porte le nom RP du candidat. */
+async function notifierDansSalon(candidature, fabriqueMessage, statut, id, host) {
+  try {
+    const salon = await trouverSalonParNomRp(process.env.DISCORD_GUILD_ID, candidature.reponses?.nomPersonnage);
+    if (!salon) return '?dm=echec';
+    const lien = statut === 'acceptee' ? `https://${host}/rejoindre/${id}` : null;
+    await envoyerMessageSalon(salon.id, {
+      content: `<@${candidature.candidatUserId}>`,
+      embeds: [fabriqueMessage(candidature, lien)]
+    });
+    return `?dm=salon&salon=${encodeURIComponent(salon.name)}`;
+  } catch (err) {
+    console.error('Notification dans le salon échouée :', err);
+    return '?dm=echec';
+  }
+}
+
 module.exports = async (req, res) => {
   const session = await exigerStaff(req, res);
   if (!session) return;
@@ -102,7 +119,7 @@ module.exports = async (req, res) => {
             roleInfo = '?dm=ok';
           } catch (err) {
             console.error('DM de notification échoué :', err);
-            roleInfo = '?dm=echec';
+            roleInfo = await notifierDansSalon(candidature, fabriqueMessage, statut, id, req.headers.host);
           }
         }
       }
@@ -128,8 +145,11 @@ module.exports = async (req, res) => {
   let noticeRole = '';
   if (dmParam === 'ok') {
     noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ Message privé envoyé au candidat pour l'informer.</div></div>`;
+  } else if (dmParam === 'salon') {
+    const nomSalon = new URL(req.url, 'http://x').searchParams.get('salon') || '';
+    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ DMs fermés : message envoyé dans le salon <strong>#${echapperHtml(nomSalon)}</strong>.</div></div>`;
   } else if (dmParam === 'echec') {
-    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(255,138,138,0.4)"><div class="valeur">⚠️ Impossible d'envoyer un message privé au candidat (DMs peut-être fermés). Préviens-le autrement.</div></div>`;
+    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(255,138,138,0.4)"><div class="valeur">⚠️ Impossible d'envoyer un message privé au candidat (DMs fermés) et aucun salon ne contient son nom RP. Préviens-le autrement.</div></div>`;
   }
 
   const date = new Date(candidature.creeAt).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });

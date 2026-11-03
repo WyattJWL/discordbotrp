@@ -160,9 +160,10 @@ h1.titre { font-size: 28px; font-weight: 700; margin: 0 0 10px; letter-spacing: 
   padding: 11px 18px; text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
-.btn-accent, .btn-discord { background: var(--accent); color: var(--accent-texte); }
-.btn-accent:hover, .btn-discord:hover { background: var(--accent-survol); }
-.btn-discord { width: 100%; }
+.btn-accent { background: var(--accent); color: var(--accent-texte); }
+.btn-accent:hover { background: var(--accent-survol); }
+.btn-discord { width: 100%; background: #5865f2; color: #fff; }
+.btn-discord:hover { background: #4752c4; }
 .btn-ghost { background: var(--panneau); border-color: var(--bordure-forte); color: var(--texte); }
 .btn-ghost:hover { background: var(--panneau-haut); }
 .btn-danger { background: var(--danger-fond); border-color: var(--danger-bord); color: var(--danger); }

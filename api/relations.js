@@ -112,7 +112,7 @@ module.exports = async (req, res) => {
       <div class="mini-carte" style="margin-bottom:18px">
         <form method="POST" style="display:flex; flex-direction:column; gap:10px">
           <input type="hidden" name="_action" value="note">
-          <textarea name="texte" placeholder="Noter une rencontre, un échange, une info..." required maxlength="1000" style="min-height:70px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical"></textarea>
+          <textarea name="texte" placeholder="Noter une rencontre, un échange, une info..." required maxlength="1000" style="min-height:70px; padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical"></textarea>
           <button type="submit" class="btn btn-ghost" style="align-self:flex-start">Ajouter une note</button>
         </form>
       </div>
@@ -157,10 +157,10 @@ module.exports = async (req, res) => {
       <div class="label">Nouvelle relation</div>
       <form method="POST" style="margin-top:10px; display:flex; flex-direction:column; gap:10px">
         <input type="text" name="nom" placeholder="Nom (personnage ou gang)" required maxlength="150"
-          style="background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
+          style="padding:10px 12px; font-family:inherit; font-size:14px">
         <div style="display:flex; gap:10px">
-          <select name="type" style="flex:1; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">${optionsType}</select>
-          <select name="statut" style="flex:1; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">${optionsStatut}</select>
+          <select name="type" style="flex:1; padding:10px 12px; font-family:inherit; font-size:14px">${optionsType}</select>
+          <select name="statut" style="flex:1; padding:10px 12px; font-family:inherit; font-size:14px">${optionsStatut}</select>
         </div>
         <button type="submit" class="btn btn-accent" style="align-self:flex-start">Ajouter</button>
       </form>

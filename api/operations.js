@@ -149,16 +149,16 @@ module.exports = async (req, res) => {
     <div class="mini-carte" style="margin:18px 0 26px">
       <div class="label">Planifier quelque chose</div>
       <form method="POST" style="margin-top:10px; display:flex; flex-direction:column; gap:10px">
-        <select name="type" style="background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">${optionsType}</select>
+        <select name="type" style="padding:10px 12px; font-family:inherit; font-size:14px">${optionsType}</select>
         <input type="text" name="titre" placeholder="Titre" required maxlength="200"
-          style="background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
-        <textarea name="description" placeholder="Description, détails, plan..." maxlength="2000" style="min-height:70px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical"></textarea>
+          style="padding:10px 12px; font-family:inherit; font-size:14px">
+        <textarea name="description" placeholder="Description, détails, plan..." maxlength="2000" style="min-height:70px; padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical"></textarea>
         <div style="display:flex; gap:10px; flex-wrap:wrap">
-          <input type="datetime-local" name="date" style="flex:1; min-width:180px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
-          <input type="text" name="lieu" placeholder="Lieu" style="flex:1; min-width:140px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
+          <input type="datetime-local" name="date" style="flex:1; min-width:180px; padding:10px 12px; font-family:inherit; font-size:14px">
+          <input type="text" name="lieu" placeholder="Lieu" style="flex:1; min-width:140px; padding:10px 12px; font-family:inherit; font-size:14px">
         </div>
         <input type="text" name="participants" placeholder="Participants (noms, séparés par des virgules)" maxlength="500"
-          style="background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
+          style="padding:10px 12px; font-family:inherit; font-size:14px">
         <button type="submit" class="btn btn-accent" style="align-self:flex-start">Créer</button>
       </form>
     </div>

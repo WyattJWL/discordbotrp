@@ -81,8 +81,8 @@ module.exports = async (req, res) => {
           <form method="POST" style="margin-top:10px; display:flex; flex-direction:column; gap:10px">
             <input type="hidden" name="_action" value="modifier">
             <input type="text" name="titre" value="${echapperHtml(note.titre)}" required maxlength="200"
-              style="background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
-            <textarea name="contenu" required maxlength="4000" style="min-height:90px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical">${echapperHtml(note.contenu)}</textarea>
+              style="padding:10px 12px; font-family:inherit; font-size:14px">
+            <textarea name="contenu" required maxlength="4000" style="min-height:90px; padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical">${echapperHtml(note.contenu)}</textarea>
             <button type="submit" class="btn btn-accent" style="align-self:flex-start">Enregistrer</button>
           </form>
         </div>
@@ -122,8 +122,8 @@ module.exports = async (req, res) => {
       <div class="label">Nouvelle note</div>
       <form method="POST" style="margin-top:10px; display:flex; flex-direction:column; gap:10px">
         <input type="text" name="titre" placeholder="Titre" required maxlength="200"
-          style="background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:14px">
-        <textarea name="contenu" placeholder="Contenu..." required maxlength="4000" style="min-height:90px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical"></textarea>
+          style="padding:10px 12px; font-family:inherit; font-size:14px">
+        <textarea name="contenu" placeholder="Contenu..." required maxlength="4000" style="min-height:90px; padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical"></textarea>
         <button type="submit" class="btn btn-accent" style="align-self:flex-start">Ajouter la note</button>
       </form>
     </div>

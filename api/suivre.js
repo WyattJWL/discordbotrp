@@ -35,7 +35,7 @@ function enrobage(corps) {
   <div class="marque">
     <div class="ecusson">SN</div>
     <div>
-      <div class="nom">SANGRE <span>NEGRA</span></div>
+      <div class="nom">Sangre Negra</div>
       <div class="sous">Suivi de candidature</div>
     </div>
   </div>

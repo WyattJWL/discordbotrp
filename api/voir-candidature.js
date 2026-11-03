@@ -144,12 +144,12 @@ module.exports = async (req, res) => {
   const dmParam = new URL(req.url, 'http://x').searchParams.get('dm');
   let noticeRole = '';
   if (dmParam === 'ok') {
-    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ Message privé envoyé au candidat pour l'informer.</div></div>`;
+    noticeRole = `<div class="mini-carte succes" style="margin-bottom:18px"><div class="valeur">✅ Message privé envoyé au candidat pour l'informer.</div></div>`;
   } else if (dmParam === 'salon') {
     const nomSalon = new URL(req.url, 'http://x').searchParams.get('salon') || '';
-    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(95,224,138,0.4)"><div class="valeur">✅ DMs fermés : message envoyé dans le salon <strong>#${echapperHtml(nomSalon)}</strong>.</div></div>`;
+    noticeRole = `<div class="mini-carte succes" style="margin-bottom:18px"><div class="valeur">✅ DMs fermés : message envoyé dans le salon <strong>#${echapperHtml(nomSalon)}</strong>.</div></div>`;
   } else if (dmParam === 'echec') {
-    noticeRole = `<div class="mini-carte" style="margin-bottom:18px; border-color:rgba(255,138,138,0.4)"><div class="valeur">⚠️ Impossible d'envoyer un message privé au candidat (DMs fermés) et aucun salon ne contient son nom RP. Préviens-le autrement.</div></div>`;
+    noticeRole = `<div class="mini-carte erreur" style="margin-bottom:18px"><div class="valeur">⚠️ Impossible d'envoyer un message privé au candidat (DMs fermés) et aucun salon ne contient son nom RP. Préviens-le autrement.</div></div>`;
   }
 
   const date = new Date(candidature.creeAt).toLocaleString('fr-FR', { dateStyle: 'long', timeStyle: 'short' });
@@ -181,7 +181,7 @@ module.exports = async (req, res) => {
       <form method="POST" style="margin-top:10px">
         <input type="hidden" name="_action" value="statut">
         <div class="radios" style="margin-bottom:14px">${boutonsStatut}</div>
-        <textarea name="note" placeholder="Note pour le candidat (visible sur sa page de suivi — utile surtout pour expliquer un refus ou des corrections à apporter)" style="width:100%; min-height:70px; background:#1b1414; border:1px solid var(--bordure); border-radius:9px; color:var(--texte); padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical">${echapperHtml(candidature.noteStaff || '')}</textarea>
+        <textarea name="note" placeholder="Note pour le candidat (visible sur sa page de suivi — utile surtout pour expliquer un refus ou des corrections à apporter)" style="width:100%; min-height:70px; padding:10px 12px; font-family:inherit; font-size:13.5px; resize:vertical">${echapperHtml(candidature.noteStaff || '')}</textarea>
         <button type="submit" class="btn btn-accent" style="margin-top:12px">Mettre à jour le statut</button>
       </form>
     </div>

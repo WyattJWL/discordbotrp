@@ -311,6 +311,15 @@ h1.titre { font-size: 28px; font-weight: 700; margin: 0 0 10px; letter-spacing: 
 
 code { background: var(--panneau-haut); border: 1px solid var(--bordure); border-radius: 5px; padding: 1px 6px; font-size: 0.9em; }
 
+/* ---------- Formulaires dans l'espace connecté ---------- */
+.titre-section { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin: 30px 0 12px; }
+.formulaire-impots .champ { margin-bottom: 18px; }
+.formulaire-impots label:not(.radios label) { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.formulaire-impots .aide { font-size: 13px; color: var(--texte-faible); margin-top: 6px; line-height: 1.5; }
+.formulaire-impots .champ-partenaire { display: none; }
+.formulaire-impots:has(input[value="couple"]:checked) .champ-partenaire { display: block; }
+.ligne-formulaire { display: flex; gap: 10px; }
+
 /* ---------- Mobile ---------- */
 @media (max-width: 760px) {
   .app { flex-direction: column; }
@@ -351,7 +360,9 @@ code { background: var(--panneau-haut); border: 1px solid var(--bordure); border
   input[type="text"], input[type="datetime-local"], input:not([type]), select, textarea { font-size: 16px !important; }
   .btn { min-height: 44px; }
   .radios label { min-width: calc(50% - 4px); }
-  .grille-cartes { grid-template-columns: 1fr; }
+  .grille-cartes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .mini-carte { padding: 14px; overflow-wrap: anywhere; }
+  .mini-carte .valeur.gros { font-size: 22px; }
   .liste-item { gap: 10px; padding: 14px 16px; }
   .liste-item > div:first-child { min-width: 0; overflow-wrap: anywhere; }
   .liste-item .statut-badge { flex-shrink: 0; }

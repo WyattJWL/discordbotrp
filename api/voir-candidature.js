@@ -10,18 +10,18 @@ const embeds = require('../lib/embeds');
 const MESSAGES_STATUT = {
   acceptee: (candidature, lien) => embeds.succes(
     '🎉 Candidature acceptée !',
-    `Ta candidature pour rejoindre **Sangre Negra** a été acceptée.` +
+    `Ta candidature pour rejoindre **M13** a été acceptée.` +
     (candidature.noteStaff ? `\n\n**Message du staff :** ${candidature.noteStaff}` : '') +
     `\n\nClique ci-dessous pour accepter les conditions et finaliser ton arrivée :\n${lien}`
   ),
   refusee: (candidature) => embeds.erreur(
     'Candidature refusée',
-    `Ta candidature pour rejoindre **Sangre Negra** a été refusée.` +
+    `Ta candidature pour rejoindre **M13** a été refusée.` +
     (candidature.noteStaff ? `\n\n**Message du staff :** ${candidature.noteStaff}` : '')
   ),
   corrections: (candidature) => embeds.attention(
     'Corrections demandées',
-    `Le staff a demandé des corrections sur ta candidature pour **Sangre Negra**.` +
+    `Le staff a demandé des corrections sur ta candidature pour **M13**.` +
     (candidature.noteStaff ? `\n\n**Message du staff :** ${candidature.noteStaff}` : '') +
     `\n\nTu peux repostuler avec une nouvelle candidature une fois corrigée.`
   )
@@ -35,7 +35,7 @@ const LIBELLES = {
   autreFaction: 'Autre faction / gang',
   nomPersonnage: 'Nom du personnage',
   histoire: 'Histoire du personnage',
-  motivation: 'Pourquoi Sangre Negra',
+  motivation: 'Pourquoi M13',
   apport: 'Ce qu’il/elle apporte',
   miseEnSituation: 'Mise en situation',
   origine: 'Comment il/elle nous a connus',

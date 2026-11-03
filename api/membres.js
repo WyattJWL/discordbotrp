@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
     corps: `
       <div class="eyebrow">Organisation</div>
       <h1 class="titre">Annuaire des <span>membres</span></h1>
-      <p class="texte-intro">Tous les membres de Sangre Negra, par rang.</p>
+      <p class="texte-intro">Tous les membres de M13, par rang.</p>
       ${corps}
     `
   }));

@@ -27,15 +27,15 @@ function enrobage(corps) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Suivre ma candidature — Sangre Negra</title>
+<title>Suivre ma candidature — M13</title>
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 <div class="topnav">
   <div class="marque">
-    <div class="ecusson">SN</div>
+    <div class="ecusson">M13</div>
     <div>
-      <div class="nom">Sangre Negra</div>
+      <div class="nom">M13</div>
       <div class="sous">Suivi de candidature</div>
     </div>
   </div>
@@ -124,7 +124,7 @@ async function gererRejoindre(req, res, session, id) {
         Candidature acceptée
       </div>
       <h1 class="titre">Bienvenue, <span>${nom}</span></h1>
-      <p class="texte-intro">Dernière étape avant de rejoindre officiellement Sangre Negra : lis et accepte les conditions ci-dessous.</p>
+      <p class="texte-intro">Dernière étape avant de rejoindre officiellement M13 : lis et accepte les conditions ci-dessous.</p>
 
       <ul class="liste-conditions" style="text-align:left">
       ${conditions}
@@ -135,7 +135,7 @@ async function gererRejoindre(req, res, session, id) {
         <span>J'ai lu et j'accepte ces conditions</span>
       </label>
 
-      <button type="button" id="btnRejoindre" class="btn btn-accent btn-large" disabled style="margin-top:16px">Rejoindre Sangre Negra</button>
+      <button type="button" id="btnRejoindre" class="btn btn-accent btn-large" disabled style="margin-top:16px">Rejoindre M13</button>
 
       <div class="alerte" id="erreurRejoindre"></div>
 
@@ -185,7 +185,7 @@ async function gererRejoindre(req, res, session, id) {
             clearInterval(minuteur);
             if (!resultat.ok) throw new Error(resultat.erreur || 'Une erreur est survenue.');
             barre.style.width = '100%';
-            texte.textContent = 'Bienvenue dans Sangre Negra !';
+            texte.textContent = 'Bienvenue dans M13 !';
             setTimeout(function () { window.location.href = '/espace'; }, 800);
           })
           .catch(function (err) {
@@ -224,7 +224,7 @@ module.exports = async (req, res) => {
           Suivi
         </div>
         <h1 class="titre">Aucune candidature <span>en cours</span></h1>
-        <p class="texte-intro">Tu n'as pas encore postulé pour rejoindre Sangre Negra.</p>
+        <p class="texte-intro">Tu n'as pas encore postulé pour rejoindre M13.</p>
         <a class="btn btn-accent btn-large" href="/candidature" style="margin-top:18px">Postuler maintenant</a>
       </div>
     `));

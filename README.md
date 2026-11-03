@@ -1,4 +1,4 @@
-# Bot Discord — Impôts (Sangre Negra RP)
+# Bot Discord — Impôts (M13 RP)
 
 Bot Discord (discord.js v14, commandes `/slash`) pour gérer le système d'impôts d'une organisation RP (GTA 5 / Prime RP) : déclaration, calcul automatique, codes promo de réduction, et outils admin. Toutes les réponses sont **privées** (visibles seulement par la personne qui tape la commande). Stockage local dans un fichier JSON (`data/db.json`), aucune base de données externe à installer.
 

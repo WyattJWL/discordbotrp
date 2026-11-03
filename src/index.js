@@ -23,7 +23,7 @@ for (const file of fs.readdirSync(commandsPath).filter((f) => f.endsWith('.js'))
 client.once('clientReady', () => {
   console.log(`Connecté en tant que ${client.user.tag}`);
   console.log(`${client.commands.size} commandes chargées : ${[...client.commands.keys()].join(', ')}`);
-  client.user.setActivity('Sangre Negra RP', { type: ActivityType.Watching });
+  client.user.setActivity('M13 RP', { type: ActivityType.Watching });
 });
 
 client.on('interactionCreate', async (interaction) => {
